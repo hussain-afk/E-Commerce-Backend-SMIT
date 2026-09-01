@@ -13,7 +13,10 @@ app.use(cors({
     origin: config.frontendUrl,
     credentials: true
 }))
-app.use(cookieParser())
+app.use(cookieParser({
+    sameSite: "none",
+    secure: true
+}))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 // routes
