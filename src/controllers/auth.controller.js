@@ -129,7 +129,12 @@ export const logoutUser = (req, res) => {
         if (!token) {
             return res.status(400).json({ message: "No token found" })
         }
-        res.clearCookie("token")
+        res.clearCookie('token', {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'none',
+            path: '/',
+        });
         res.status(200).json({ message: "Logout successful" })
     } catch (error) {
         res.status(500).json({ message: "Internal server error" })
