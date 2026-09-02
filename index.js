@@ -6,29 +6,12 @@ import authRoutes from "./src/router/auth.route.js"
 import productRoutes from "./src/router/products.route.js"
 import cors from "cors"
 
-// console.log(config.frontendUrl)
 // middleware
 const app = express();
-const allowedOrigins = [
-  config.frontendUrl,
-  config.adminFrontendUrl,
-];
-
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
-
+app.use(cors({
+    origin: [config.frontendUrl, config.adminFrontendUrl],
+    credentials: true
+}))
 app.use(cookieParser())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
