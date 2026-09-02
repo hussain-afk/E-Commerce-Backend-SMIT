@@ -6,6 +6,7 @@ const config = {
     mongoUri: process.env.MONGO_URI,
     jwtSecret: process.env.JWT_SECRET,
     frontendUrl: process.env.FRONTEND_URL,
+    adminFrontendUrl: process.env.ADMIN_DRONTEND_URL,
     tokenExpiration: process.env.TOKEN_EXPIRATION
 }
 

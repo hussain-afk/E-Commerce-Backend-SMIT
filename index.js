@@ -10,7 +10,7 @@ import cors from "cors"
 // middleware
 const app = express()
 app.use(cors({
-    origin: config.frontendUrl,
+    origin: [config.frontendUrl, config.adminFrontendUrl],
     credentials: true
 }))
 app.use(cookieParser())
