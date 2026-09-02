@@ -33,11 +33,13 @@ export const registerUser = async (req, res) => {
         })
         const token = generateToken(newUser._id, newUser.role)
         // Set the token in a cookie
-        res.cookie('token', token, {
-            httpOnly: true,
-            secure: true,
-            sameSite: 'none'
-        });
+        res.cookie('token', token,
+            {
+                httpOnly: true,
+                secure: true,
+                sameSite: 'none'
+            }
+        );
         res.status(201).json({
             message: "User created successfully", user: {
                 id: newUser._id,
@@ -71,11 +73,13 @@ export const loginUser = async (req, res) => {
         }
         const token = generateToken(user._id, user.role)
         // Set the token in a cookie
-        res.cookie('token', token, {
-            httpOnly: true,
-            secure: true,
-            sameSite: 'none'
-        });
+        res.cookie('token', token,
+            {
+                httpOnly: true,
+                secure: true,
+                sameSite: 'none'
+            }
+        );
         res.status(200).json({
             message: "Login successful", user: {
                 id: user._id,
@@ -83,6 +87,40 @@ export const loginUser = async (req, res) => {
                 email: user.email,
                 role: user.role
             }, token
+        })
+    } catch (error) {
+        res.status(500).json({ message: "Internal server error" })
+    }
+}
+/**
+ * @desc Admin login user
+ * @route POST /api/admin/login
+ * @access Private (admin only)
+ */
+export const adminLoginUser = async (req, res) => {
+    const { username, password } = req.body
+    try {
+        if (!username || !password) {
+            return res.status(400).json({ message: "All fields are required" })
+        }
+        const user = await userSchema.findOne({ username })
+        if (!user) {
+            return res.status(401).json({ message: "Invalid email or password" })
+        }
+        const isPasswordValid = await bcrypt.compare(password, user.password)
+        if (!isPasswordValid) {
+            return res.status(401).json({ message: "Invalid email or password" })
+        }
+        if (user.role !== "admin") {
+            return res.status(403).json({ message: "Forbidden: Admins only" })
+        }
+        res.status(200).json({
+            message: "Login successful", user: {
+                id: user._id,
+                username: user.username,
+                email: user.email,
+                role: user.role
+            }
         })
     } catch (error) {
         res.status(500).json({ message: "Internal server error" })
@@ -148,6 +186,10 @@ export const logoutUser = (req, res) => {
 export const deleteUser = async (req, res) => {
     try {
         const { id } = req.params;
+        const user = req.user;
+        if (user.role !== "admin") {
+            return res.status(403).json({ message: "Forbidden: Admins only" })
+        }
         const deletedUser = await userSchema.findByIdAndDelete(id);
         if (!deletedUser) {
             return res.status(404).json({
@@ -171,7 +213,11 @@ export const deleteUser = async (req, res) => {
  */
 export const getAllUsers = async (req, res) => {
     try {
-        const users = await userSchema.find({}, { password: 0 }) // Exclude password field
+        const user = req.user
+        if (user.role !== "admin") {
+            return res.status(403).json({ message: "Forbidden: Admins only" })
+        }
+        const users = await userSchema.find() // Exclude password field
         res.status(200).json({ users })
     } catch (error) {
         res.status(500).json({ message: "Internal server error" })
