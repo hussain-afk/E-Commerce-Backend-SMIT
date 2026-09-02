@@ -8,7 +8,7 @@ import cors from "cors"
 
 // console.log(config.frontendUrl)
 // middleware
-const app = express()
+const app = express();
 app.use(cors({
     origin: [config.frontendUrl, config.adminFrontendUrl],
     credentials: true
